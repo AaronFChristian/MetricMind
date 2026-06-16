@@ -1,0 +1,81 @@
+# docker-compose.yml
+# Full local stack: FastAPI + Redis + Prometheus + Grafana
+#
+# Usage:
+#   docker compose up          start everything
+#   docker compose up --build  rebuild after code changes
+#   docker compose down        stop everything
+#
+# After starting:
+#   FastAPI:    http://localhost:8000
+#   API docs:   http://localhost:8000/docs
+#   Metrics:    http://localhost:8000/metrics   (raw Prometheus text)
+#   Prometheus: http://localhost:9090
+#   Grafana:    http://localhost:3001  (login: admin / metricmind)
+
+version: '3.9'
+
+services:
+
+  # ── FastAPI Backend ─────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - DUCKDB_PATH=/app/data/metricmind.duckdb
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./data:/app/data
+      - ./agent:/app/agent
+      - ./api:/app/api
+      - ./catalog:/app/catalog
+    depends_on:
+      - redis
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+    restart: unless-stopped
+
+  # ── Redis (query result cache) ──────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  # ── Prometheus (metrics scraper) ────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=7d'
+    restart: unless-stopped
+
+  # ── Grafana (dashboards) ────────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:10.2.0
+    ports:
+      - "3001:3000"    # 3001 to avoid conflict with React on 3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=metricmind
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/metricmind.json
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  grafana-data:

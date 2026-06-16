@@ -1,0 +1,18 @@
+# MetricMind Python dependencies
+anthropic
+langchain-anthropic
+langchain
+langgraph
+langsmith
+sqlglot
+fastapi
+uvicorn
+python-jose[cryptography]
+passlib
+pydantic
+httpx
+redis
+python-dotenv
+duckdb
+pandas
+python-multipart

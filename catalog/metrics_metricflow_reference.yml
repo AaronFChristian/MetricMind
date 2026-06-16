@@ -1,0 +1,112 @@
+# ============================================================================
+# metrics.yml — MetricFlow governed metric definitions
+#
+# These are the ONLY metrics the NL→SQL agent is allowed to query.
+# Any question referencing a metric not in this file is rejected by the
+# guardrail layer with: "I can only answer questions about certified metrics."
+#
+# Format: dbt MetricFlow (dbt-core >= 1.6)
+# Docs: https://docs.getdbt.com/docs/build/metrics-overview
+# ============================================================================
+
+version: 2
+
+metrics:
+
+  # ── 1. Monthly Active Users ─────────────────────────────────────────────────
+  - name: monthly_active_users
+    label: "Monthly Active Users (MAU)"
+    description: >
+      Count of distinct users with at least one governed activity event in the
+      calendar month. Activity definition: event_type IN (page_view, feature_used,
+      api_call, export). Source of truth: vars.activity_event_types in dbt_project.yml.
+    type: simple
+    type_params:
+      measure: distinct_active_users_monthly
+    filter: |
+      {{ Dimension('user__is_activity_event') }} = true
+    dimensions:
+      - plan
+      - country
+      - acquisition_channel
+    time_spine_table_configuration:
+      column_name: event_month
+      location: start_of_period
+
+  # ── 2. Daily Active Users ───────────────────────────────────────────────────
+  - name: daily_active_users
+    label: "Daily Active Users (DAU)"
+    description: >
+      Count of distinct users with at least one governed activity event on a
+      given calendar date. Same activity definition as MAU.
+    type: simple
+    type_params:
+      measure: distinct_active_users_daily
+    dimensions:
+      - plan
+      - country
+      - acquisition_channel
+
+  # ── 3. 30-Day Retention Rate ────────────────────────────────────────────────
+  - name: thirty_day_retention_rate
+    label: "30-Day Retention Rate"
+    description: >
+      Percentage of users from a signup cohort who were active again between
+      days 28–35 after their signup date. A 7-day window is used to account for
+      users on monthly cadences who are slightly off-schedule.
+      Formula: day30_retained / signups × 100
+    type: ratio
+    type_params:
+      numerator: day30_retained_users
+      denominator: total_signups
+    dimensions:
+      - plan
+      - country
+      - acquisition_channel
+      - cohort_month
+
+  # ── 4. Monthly Recurring Revenue ────────────────────────────────────────────
+  - name: monthly_recurring_revenue
+    label: "Monthly Recurring Revenue (MRR)"
+    description: >
+      Sum of monthly_recurring_revenue from active subscriptions in USD.
+      Excludes negative MRR rows (data quality issues flagged in stg_subscriptions).
+      For annualised view, use the arr metric.
+    type: simple
+    type_params:
+      measure: sum_mrr
+    dimensions:
+      - plan
+      - country
+      - acquisition_channel
+
+  # ── 5. Customer Lifetime Value ───────────────────────────────────────────────
+  - name: customer_lifetime_value
+    label: "Customer Lifetime Value (LTV)"
+    description: >
+      Estimated LTV using the simple formula: ARPU / monthly_churn_rate × gross_margin.
+      Gross margin assumption: 70% (var.ltv_margin_assumption in dbt_project.yml).
+      This is a model-based estimate, not actual observed LTV.
+      For cohort-based LTV, use the cohort retention mart directly.
+    type: simple
+    type_params:
+      measure: estimated_ltv
+    dimensions:
+      - plan
+      - country
+      - acquisition_channel
+
+  # ── 6. Churn Rate ────────────────────────────────────────────────────────────
+  - name: churn_rate
+    label: "Monthly Churn Rate"
+    description: >
+      Percentage of paying customers who cancelled their subscription in a given month.
+      Formula: churned_customers / paying_customers_start_of_month × 100.
+      Note: does not include plan downgrades (only full cancellations).
+    type: ratio
+    type_params:
+      numerator: churned_customers_count
+      denominator: paying_customers_start_of_month
+    dimensions:
+      - plan
+      - country

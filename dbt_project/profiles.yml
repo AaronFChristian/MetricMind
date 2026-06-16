@@ -1,0 +1,28 @@
+metricmind:
+  target: duckdb            # default to local — no cloud credentials needed to start
+
+  outputs:
+
+    # ── LOCAL DEV: DuckDB ────────────────────────────────────────────────────
+    # Zero setup, zero cost, runs entirely in-process.
+    # dbt-duckdb package required: pip install dbt-duckdb
+    duckdb:
+      type: duckdb
+      path: "{{ env_var('DUCKDB_PATH', '../data/metricmind.duckdb') }}"
+      threads: 4
+
+    # ── PRODUCTION: Snowflake ────────────────────────────────────────────────
+    # Free trial at snowflake.com — 30 days, $400 credit, no credit card needed.
+    # All credentials pulled from environment variables — never hardcoded.
+    # Set these in your shell or in a .env file (which is .gitignored).
+    snowflake:
+      type: snowflake
+      account:   "{{ env_var('SNOWFLAKE_ACCOUNT') }}"       # e.g. xy12345.us-east-1
+      user:      "{{ env_var('SNOWFLAKE_USER') }}"
+      password:  "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role:      "{{ env_var('SNOWFLAKE_ROLE', 'TRANSFORMER') }}"
+      database:  "{{ env_var('SNOWFLAKE_DATABASE', 'METRICMIND') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'COMPUTE_WH') }}"
+      schema:    raw
+      threads:   4
+      client_session_keep_alive: false

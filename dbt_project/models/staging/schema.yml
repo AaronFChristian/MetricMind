@@ -1,0 +1,125 @@
+version: 2
+
+models:
+
+  - name: stg_users
+    description: >
+      Cleaned and typed user records. One row per user.
+      Source data quality issues are surfaced via tests, not silently filtered.
+    columns:
+      - name: user_id
+        description: "Unique user identifier. Null values indicate data pipeline gaps in the source system."
+        data_tests:
+          - not_null
+          - unique
+      - name: email
+        description: "User email address, lowercased and trimmed."
+        data_tests:
+          - not_null
+          - unique
+      - name: signup_date
+        description: "Date user created their account. Future dates indicate clock skew in source."
+        data_tests:
+          - not_null
+      - name: plan
+        description: "Current subscription plan at signup time."
+        data_tests:
+          - not_null
+          - accepted_values:
+              config:
+                severity: warn
+              values: ['free', 'starter', 'pro', 'enterprise', 'unknown']
+      - name: acquisition_channel
+        description: "Marketing channel that drove the signup."
+        data_tests:
+          - accepted_values:
+              config:
+                severity: warn
+              values: ['organic', 'paid_search', 'referral', 'direct', 'email', 'unknown']
+      - name: country
+        description: "ISO 3166-1 alpha-2 country code."
+        data_tests:
+          - not_null
+
+  - name: stg_events
+    description: >
+      Product usage events. The is_activity_event flag derives from
+      vars.activity_event_types — the governed activity definition.
+    columns:
+      - name: event_id
+        description: "Unique event identifier."
+        data_tests:
+          - not_null
+          - unique
+      - name: event_type
+        description: "Type of product event, lowercased."
+        data_tests:
+          - not_null
+          - accepted_values:
+              config:
+                severity: warn
+              values:
+                - 'page_view'
+                - 'feature_used'
+                - 'api_call'
+                - 'export'
+                - 'login'
+                - 'settings_change'
+      - name: event_timestamp
+        description: "UTC timestamp of the event."
+        data_tests:
+          - not_null
+      - name: is_activity_event
+        description: "True if this event counts toward the active user metric."
+        data_tests:
+          - not_null
+
+  - name: stg_subscriptions
+    description: >
+      Cleaned subscription records. One row per subscription.
+    columns:
+      - name: subscription_id
+        description: "Unique subscription identifier."
+        data_tests:
+          - not_null
+          - unique
+      - name: user_id
+        description: "User who owns this subscription."
+        data_tests:
+          - not_null
+      - name: plan
+        description: "Subscription plan name."
+        data_tests:
+          - accepted_values:
+              config:
+                severity: warn
+              values: ['free', 'starter', 'pro', 'enterprise', 'unknown']
+      - name: mrr_usd
+        description: "Monthly recurring revenue in USD. Negative values are a data quality issue."
+        data_tests:
+          - not_null
+      - name: is_active
+        description: "True if subscription has no ended_at date."
+        data_tests:
+          - not_null
+
+  - name: stg_payments
+    description: >
+      Cleaned payment records. is_suspected_dirty flags negative amounts
+      without a refund flag — a known data quality issue.
+    columns:
+      - name: payment_id
+        description: "Unique payment identifier."
+        data_tests:
+          - not_null
+          - unique
+      - name: user_id
+        description: "User who made the payment."
+        data_tests:
+          - not_null
+      - name: net_amount_usd
+        description: "Business-correct payment amount after refund sign correction."
+        data_tests:
+          - not_null
+      - name: is_suspected_dirty
+        description: "True if amount is negative but refund_flag is False."

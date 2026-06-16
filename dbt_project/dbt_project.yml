@@ -1,0 +1,43 @@
+name: 'metricmind'
+version: '1.0.0'
+config-version: 2
+
+# Profile used to connect to DuckDB (local) or Snowflake (prod)
+profile: 'metricmind'
+
+# Path config — dbt standard layout
+model-paths: ["models"]
+seed-paths:  ["seeds"]
+test-paths:  ["tests"]
+macro-paths: ["macros"]
+analysis-paths: ["analyses"]
+
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+# ── Model materialisation strategy ──────────────────────────────────────────
+# staging: views (cheap, always fresh, never queried directly by end users)
+# marts:   tables (materialised for query performance; rebuilt each dbt run)
+# metrics: not materialised by dbt — MetricFlow queries them at runtime
+models:
+  metricmind:
+    staging:
+      +materialized: view
+      +schema: staging          # lands in <target>.staging schema
+    marts:
+      +materialized: table
+      +schema: marts            # lands in <target>.marts schema
+
+# ── Global variables ─────────────────────────────────────────────────────────
+# Centralised activity definition — the ONLY place "active user" is defined.
+# Change this list and every downstream metric updates automatically.
+# This is the metric governance story we tell in interviews.
+vars:
+  activity_event_types:         # events that count as "active"
+    - 'page_view'
+    - 'feature_used'
+    - 'api_call'
+    - 'export'
+  ltv_margin_assumption: 0.70   # gross margin used in LTV calc
+  churn_lookback_days: 30       # days without activity = churned
+  currency: 'USD'

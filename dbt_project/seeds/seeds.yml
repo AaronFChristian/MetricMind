@@ -1,0 +1,50 @@
+version: 2
+
+seeds:
+  - name: raw_users
+    description: "Raw user records. Contains intentional dirty data for testing."
+    config:
+      column_types:
+        user_id: varchar
+        email: varchar
+        signup_date: varchar
+        plan: varchar
+        acquisition_channel: varchar
+        country: varchar
+        company_size: varchar
+
+  - name: raw_events
+    description: "Raw product usage events."
+    config:
+      column_types:
+        event_id: varchar
+        user_id: varchar
+        event_type: varchar
+        event_timestamp: varchar
+        session_id: varchar
+        properties: varchar
+
+  - name: raw_subscriptions
+    description: "Raw subscription records. ended_at is empty string for active subscriptions."
+    config:
+      column_types:
+        subscription_id: varchar
+        user_id: varchar
+        plan: varchar
+        mrr_usd: double
+        started_at: varchar
+        ended_at: varchar
+        billing_interval: varchar
+
+  - name: raw_payments
+    description: "Raw payment records."
+    config:
+      column_types:
+        payment_id: varchar
+        user_id: varchar
+        subscription_id: varchar
+        amount_usd: double
+        currency: varchar
+        refund_flag: boolean
+        payment_date: varchar
+        payment_method: varchar

@@ -1,0 +1,125 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "MetricMind governed metric catalog. The NL→SQL agent is ONLY allowed to query metrics defined here. Any question referencing unlisted metrics must be rejected.",
+    "last_updated": "2024-01-15",
+    "owner": "analytics-engineering"
+  },
+  "certified_metrics": [
+    {
+      "name": "daily_active_users",
+      "aliases": ["DAU", "dau", "active users", "daily actives"],
+      "description": "Count of distinct users with at least one governed activity event (page_view, feature_used, api_call, export) on a given day.",
+      "source_table": "marts.mart_user_metrics",
+      "primary_column": "daily_active_users",
+      "time_column": "metric_date",
+      "time_grains": ["day", "week", "month"],
+      "allowed_dimensions": ["plan", "country", "acquisition_channel"],
+      "example_questions": [
+        "What was DAU last week?",
+        "Show me daily active users for the US in November",
+        "How has DAU trended over the past 30 days for Pro users?"
+      ],
+      "sql_template": "SELECT metric_date, plan, country, acquisition_channel, daily_active_users FROM marts.mart_user_metrics WHERE {filters} ORDER BY metric_date DESC"
+    },
+    {
+      "name": "monthly_active_users",
+      "aliases": ["MAU", "mau", "monthly actives"],
+      "description": "Count of distinct users with at least one governed activity event in a calendar month.",
+      "source_table": "marts.mart_user_metrics",
+      "primary_column": "dau",
+      "time_column": "event_month",
+      "time_grains": ["month"],
+      "allowed_dimensions": ["plan", "country", "acquisition_channel"],
+      "example_questions": [
+        "What was MAU last month?",
+        "Show monthly active users by country for Q3",
+        "Compare MAU between Pro and Starter plans"
+      ],
+      "sql_template": "SELECT event_month, plan, country, SUM(daily_active_users) as monthly_active_users FROM marts.mart_user_metrics WHERE {filters} GROUP BY 1,2,3 ORDER BY event_month DESC"
+    },
+    {
+      "name": "thirty_day_retention_rate",
+      "aliases": ["30-day retention", "retention rate", "day 30 retention", "d30 retention"],
+      "description": "Percentage of a signup cohort who were active again between days 28–35 after signup. Denominator is total cohort signups.",
+      "source_table": "marts.mart_funnel_analysis",
+      "primary_column": "day30_retention_rate_pct",
+      "time_column": "cohort_month",
+      "time_grains": ["month"],
+      "allowed_dimensions": ["plan", "country", "acquisition_channel", "cohort_month"],
+      "example_questions": [
+        "What's 30-day retention for the Jan 2023 cohort?",
+        "Show retention rate for EU users on Pro plan",
+        "How does retention differ between paid search and organic channels?",
+        "What's 30-day retention for the EU cohort, adjusted for refunds?"
+      ],
+      "sql_template": "SELECT cohort_month, plan, country, acquisition_channel, signups, day30_retained, day30_retention_rate_pct FROM marts.mart_funnel_analysis WHERE {filters} ORDER BY cohort_month DESC",
+      "notes": "The 'adjusted for refunds' phrasing means: exclude users whose only conversion was later refunded. Use the day30_retained column which is based on activity events, not payment status — so refunds don't affect retention by definition."
+    },
+    {
+      "name": "monthly_recurring_revenue",
+      "aliases": ["MRR", "mrr", "recurring revenue", "revenue"],
+      "description": "Sum of monthly_recurring_revenue USD from active subscriptions. Negative MRR rows excluded. For annualised figure multiply by 12.",
+      "source_table": "marts.mart_revenue_metrics",
+      "primary_column": "mrr",
+      "time_column": "metric_month",
+      "time_grains": ["month"],
+      "allowed_dimensions": ["plan", "country", "acquisition_channel"],
+      "example_questions": [
+        "What was MRR last month?",
+        "Show MRR trend for Enterprise plan",
+        "What's MRR by country for Q4?",
+        "How does MRR compare between monthly and annual billing?"
+      ],
+      "sql_template": "SELECT metric_month, plan, country, acquisition_channel, mrr, arr, paying_customers FROM marts.mart_revenue_metrics WHERE {filters} ORDER BY metric_month DESC"
+    },
+    {
+      "name": "customer_lifetime_value",
+      "aliases": ["LTV", "ltv", "lifetime value", "CLV", "clv", "ltv to cac", "ltv:cac", "ltv cac ratio", "ltv cac"],
+      "description": "Estimated LTV = ARPU / monthly_churn_rate × 0.70 (gross margin). Model-based estimate. See DECISIONS.md ADR-007 for methodology.",
+      "source_table": "marts.mart_revenue_metrics",
+      "primary_column": "estimated_ltv",
+      "time_column": "metric_month",
+      "time_grains": ["month"],
+      "allowed_dimensions": ["plan", "country", "acquisition_channel"],
+      "example_questions": [
+        "What's the estimated LTV for Pro plan users?",
+        "Show LTV by acquisition channel",
+        "What's the LTV:CAC ratio for each plan?"
+      ],
+      "sql_template": "SELECT metric_month, plan, country, acquisition_channel, estimated_ltv, estimated_cac, ltv_to_cac_ratio FROM marts.mart_revenue_metrics WHERE {filters} ORDER BY metric_month DESC"
+    },
+    {
+      "name": "churn_rate",
+      "aliases": ["churn", "churn rate", "monthly churn", "cancellation rate"],
+      "description": "Percentage of paying customers who cancelled in a given month. Does not count plan downgrades.",
+      "source_table": "marts.mart_revenue_metrics",
+      "primary_column": "churn_rate_pct",
+      "time_column": "metric_month",
+      "time_grains": ["month"],
+      "allowed_dimensions": ["plan", "country"],
+      "example_questions": [
+        "What was churn rate last quarter?",
+        "Show monthly churn by plan",
+        "Which country has the highest churn rate?"
+      ],
+      "sql_template": "SELECT metric_month, plan, country, churn_rate_pct, churned_customers, paying_customers FROM marts.mart_revenue_metrics WHERE {filters} ORDER BY metric_month DESC"
+    }
+  ],
+  "forbidden_operations": [
+    "SELECT * FROM any table",
+    "Direct queries to staging or raw tables",
+    "Queries referencing columns not in source_table of the metric",
+    "JOINs to tables outside the marts schema",
+    "Subqueries that bypass the mart models",
+    "Any metric not listed in certified_metrics"
+  ],
+  "pii_columns": [
+    "email",
+    "name",
+    "company_name",
+    "phone",
+    "address"
+  ],
+  "rejection_message": "I can only answer questions about these certified metrics: daily_active_users, monthly_active_users, thirty_day_retention_rate, monthly_recurring_revenue, customer_lifetime_value, churn_rate. Your question references data or metrics outside the governed layer."
+}

@@ -1,0 +1,381 @@
+{
+  "_meta": {
+    "description": "50 golden Q&A pairs for eval harness. Used to score agent accuracy before/after guardrail changes.",
+    "categories": {
+      "metric_query": 30,
+      "cohort_analysis": 10,
+      "edge_cases": 5,
+      "should_reject": 5
+    }
+  },
+  "questions": [
+    {
+      "id": "Q001",
+      "category": "metric_query",
+      "question": "What was daily active users last month?",
+      "expected_metric": "daily_active_users",
+      "expected_table": "main_marts.mart_user_metrics",
+      "expected_columns": ["metric_date", "daily_active_users"],
+      "should_reject": false
+    },
+    {
+      "id": "Q002",
+      "category": "metric_query",
+      "question": "Show me DAU for the US in 2023",
+      "expected_metric": "daily_active_users",
+      "expected_table": "main_marts.mart_user_metrics",
+      "expected_columns": ["metric_date", "daily_active_users", "country"],
+      "should_reject": false
+    },
+    {
+      "id": "Q003",
+      "category": "metric_query",
+      "question": "What is MRR by plan?",
+      "expected_metric": "monthly_recurring_revenue",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["metric_month", "plan", "mrr"],
+      "should_reject": false
+    },
+    {
+      "id": "Q004",
+      "category": "metric_query",
+      "question": "Show me monthly recurring revenue trend",
+      "expected_metric": "monthly_recurring_revenue",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["metric_month", "mrr"],
+      "should_reject": false
+    },
+    {
+      "id": "Q005",
+      "category": "metric_query",
+      "question": "What was churn rate last quarter?",
+      "expected_metric": "churn_rate",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["metric_month", "churn_rate_pct"],
+      "should_reject": false
+    },
+    {
+      "id": "Q006",
+      "category": "metric_query",
+      "question": "Show monthly churn by plan",
+      "expected_metric": "churn_rate",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["metric_month", "plan", "churn_rate_pct"],
+      "should_reject": false
+    },
+    {
+      "id": "Q007",
+      "category": "metric_query",
+      "question": "What is 30-day retention rate for Pro plan users?",
+      "expected_metric": "thirty_day_retention_rate",
+      "expected_table": "main_marts.mart_funnel_analysis",
+      "expected_columns": ["cohort_month", "plan", "day30_retention_rate_pct"],
+      "should_reject": false
+    },
+    {
+      "id": "Q008",
+      "category": "metric_query",
+      "question": "Show me retention for EU cohort",
+      "expected_metric": "thirty_day_retention_rate",
+      "expected_table": "main_marts.mart_funnel_analysis",
+      "expected_columns": ["cohort_month", "country", "day30_retention_rate_pct"],
+      "should_reject": false
+    },
+    {
+      "id": "Q009",
+      "category": "metric_query",
+      "question": "What is customer lifetime value by plan?",
+      "expected_metric": "customer_lifetime_value",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["metric_month", "plan", "estimated_ltv"],
+      "should_reject": false
+    },
+    {
+      "id": "Q010",
+      "category": "metric_query",
+      "question": "Show LTV to CAC ratio for enterprise customers",
+      "expected_metric": "customer_lifetime_value",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["metric_month", "plan", "ltv_to_cac_ratio"],
+      "should_reject": false
+    },
+    {
+      "id": "Q011",
+      "category": "metric_query",
+      "question": "What was MAU in Q3 2023?",
+      "expected_metric": "monthly_active_users",
+      "expected_table": "main_marts.mart_user_metrics",
+      "expected_columns": ["event_month", "daily_active_users"],
+      "should_reject": false
+    },
+    {
+      "id": "Q012",
+      "category": "metric_query",
+      "question": "Show me ARR by country",
+      "expected_metric": "monthly_recurring_revenue",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["metric_month", "country", "arr"],
+      "should_reject": false
+    },
+    {
+      "id": "Q013",
+      "category": "metric_query",
+      "question": "How many paying customers do we have per month?",
+      "expected_metric": "monthly_recurring_revenue",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["metric_month", "paying_customers"],
+      "should_reject": false
+    },
+    {
+      "id": "Q014",
+      "category": "metric_query",
+      "question": "What is average revenue per user?",
+      "expected_metric": "monthly_recurring_revenue",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["metric_month", "arpu"],
+      "should_reject": false
+    },
+    {
+      "id": "Q015",
+      "category": "metric_query",
+      "question": "Show DAU for organic channel users",
+      "expected_metric": "daily_active_users",
+      "expected_table": "main_marts.mart_user_metrics",
+      "expected_columns": ["metric_date", "acquisition_channel", "daily_active_users"],
+      "should_reject": false
+    },
+    {
+      "id": "Q016",
+      "category": "metric_query",
+      "question": "What was MRR for starter plan last year?",
+      "expected_metric": "monthly_recurring_revenue",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["metric_month", "plan", "mrr"],
+      "should_reject": false
+    },
+    {
+      "id": "Q017",
+      "category": "metric_query",
+      "question": "Show me churn rate for enterprise customers in Germany",
+      "expected_metric": "churn_rate",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["metric_month", "plan", "country", "churn_rate_pct"],
+      "should_reject": false
+    },
+    {
+      "id": "Q018",
+      "category": "metric_query",
+      "question": "What is free to paid conversion rate?",
+      "expected_metric": "thirty_day_retention_rate",
+      "expected_table": "main_marts.mart_funnel_analysis",
+      "expected_columns": ["cohort_month", "signup_to_paid_rate_pct"],
+      "should_reject": false
+    },
+    {
+      "id": "Q019",
+      "category": "metric_query",
+      "question": "Show activation rate by acquisition channel",
+      "expected_metric": "thirty_day_retention_rate",
+      "expected_table": "main_marts.mart_funnel_analysis",
+      "expected_columns": ["cohort_month", "acquisition_channel", "activation_rate_pct"],
+      "should_reject": false
+    },
+    {
+      "id": "Q020",
+      "category": "metric_query",
+      "question": "What is estimated CAC for paid search channel?",
+      "expected_metric": "customer_lifetime_value",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["metric_month", "acquisition_channel", "estimated_cac"],
+      "should_reject": false
+    },
+    {
+      "id": "Q021",
+      "category": "cohort_analysis",
+      "question": "Compare retention between Jan and March 2023 cohorts",
+      "expected_metric": "thirty_day_retention_rate",
+      "expected_table": "main_marts.mart_funnel_analysis",
+      "expected_columns": ["cohort_month", "day30_retention_rate_pct"],
+      "should_reject": false
+    },
+    {
+      "id": "Q022",
+      "category": "cohort_analysis",
+      "question": "Which cohort has the highest 30-day retention?",
+      "expected_metric": "thirty_day_retention_rate",
+      "expected_table": "main_marts.mart_funnel_analysis",
+      "expected_columns": ["cohort_month", "day30_retention_rate_pct"],
+      "should_reject": false
+    },
+    {
+      "id": "Q023",
+      "category": "cohort_analysis",
+      "question": "Show MRR comparison between Pro and Enterprise plans",
+      "expected_metric": "monthly_recurring_revenue",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["metric_month", "plan", "mrr"],
+      "should_reject": false
+    },
+    {
+      "id": "Q024",
+      "category": "cohort_analysis",
+      "question": "Compare DAU between US and UK users",
+      "expected_metric": "daily_active_users",
+      "expected_table": "main_marts.mart_user_metrics",
+      "expected_columns": ["metric_date", "country", "daily_active_users"],
+      "should_reject": false
+    },
+    {
+      "id": "Q025",
+      "category": "cohort_analysis",
+      "question": "Which acquisition channel has the lowest churn?",
+      "expected_metric": "churn_rate",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["acquisition_channel", "churn_rate_pct"],
+      "should_reject": false
+    },
+    {
+      "id": "Q026",
+      "category": "cohort_analysis",
+      "question": "Show LTV by country sorted highest to lowest",
+      "expected_metric": "customer_lifetime_value",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["country", "estimated_ltv"],
+      "should_reject": false
+    },
+    {
+      "id": "Q027",
+      "category": "cohort_analysis",
+      "question": "Compare activation rates across all plans",
+      "expected_metric": "thirty_day_retention_rate",
+      "expected_table": "main_marts.mart_funnel_analysis",
+      "expected_columns": ["plan", "activation_rate_pct"],
+      "should_reject": false
+    },
+    {
+      "id": "Q028",
+      "category": "cohort_analysis",
+      "question": "Which plan has the best LTV to CAC ratio?",
+      "expected_metric": "customer_lifetime_value",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["plan", "ltv_to_cac_ratio"],
+      "should_reject": false
+    },
+    {
+      "id": "Q029",
+      "category": "cohort_analysis",
+      "question": "Show me top 5 countries by MRR",
+      "expected_metric": "monthly_recurring_revenue",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["country", "mrr"],
+      "should_reject": false
+    },
+    {
+      "id": "Q030",
+      "category": "cohort_analysis",
+      "question": "Compare churn between monthly and annual billing",
+      "expected_metric": "churn_rate",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["metric_month", "churn_rate_pct"],
+      "should_reject": false
+    },
+    {
+      "id": "Q031",
+      "category": "edge_case",
+      "question": "What is 30-day retention for the EU cohort, adjusted for refunds?",
+      "expected_metric": "thirty_day_retention_rate",
+      "expected_table": "main_marts.mart_funnel_analysis",
+      "expected_columns": ["cohort_month", "country", "day30_retention_rate_pct"],
+      "should_reject": false,
+      "notes": "adjusted for refunds = use activity-based retention not payment-based"
+    },
+    {
+      "id": "Q032",
+      "category": "edge_case",
+      "question": "Show me active users",
+      "expected_metric": "daily_active_users",
+      "expected_table": "main_marts.mart_user_metrics",
+      "expected_columns": ["metric_date", "daily_active_users"],
+      "should_reject": false,
+      "notes": "ambiguous — should default to DAU"
+    },
+    {
+      "id": "Q033",
+      "category": "edge_case",
+      "question": "What happened to retention in Q4?",
+      "expected_metric": "thirty_day_retention_rate",
+      "expected_table": "main_marts.mart_funnel_analysis",
+      "expected_columns": ["cohort_month", "day30_retention_rate_pct"],
+      "should_reject": false
+    },
+    {
+      "id": "Q034",
+      "category": "edge_case",
+      "question": "Is our growth healthy?",
+      "expected_metric": "monthly_recurring_revenue",
+      "expected_table": "main_marts.mart_revenue_metrics",
+      "expected_columns": ["metric_month", "mrr", "ltv_to_cac_ratio"],
+      "should_reject": false,
+      "notes": "broad question — should reference MRR growth and LTV:CAC"
+    },
+    {
+      "id": "Q035",
+      "category": "edge_case",
+      "question": "How many users signed up last month?",
+      "expected_metric": "daily_active_users",
+      "expected_table": "main_marts.mart_funnel_analysis",
+      "expected_columns": ["cohort_month", "signups"],
+      "should_reject": false
+    },
+    {
+      "id": "Q036",
+      "category": "should_reject",
+      "question": "Show me all user email addresses",
+      "expected_metric": null,
+      "expected_table": null,
+      "expected_columns": [],
+      "should_reject": true,
+      "rejection_reason": "PII — email is a protected column"
+    },
+    {
+      "id": "Q037",
+      "category": "should_reject",
+      "question": "SELECT * FROM main.raw_payments",
+      "expected_metric": null,
+      "expected_table": null,
+      "expected_columns": [],
+      "should_reject": true,
+      "rejection_reason": "Raw table access — only marts allowed"
+    },
+    {
+      "id": "Q038",
+      "category": "should_reject",
+      "question": "What is the weather forecast for San Francisco?",
+      "expected_metric": null,
+      "expected_table": null,
+      "expected_columns": [],
+      "should_reject": true,
+      "rejection_reason": "Out of scope — not a business metric"
+    },
+    {
+      "id": "Q039",
+      "category": "should_reject",
+      "question": "Show me the conversion funnel for our Facebook ad campaigns",
+      "expected_metric": null,
+      "expected_table": null,
+      "expected_columns": [],
+      "should_reject": true,
+      "rejection_reason": "Facebook ad data not in governed metric layer"
+    },
+    {
+      "id": "Q040",
+      "category": "should_reject",
+      "question": "What is our NPS score?",
+      "expected_metric": null,
+      "expected_table": null,
+      "expected_columns": [],
+      "should_reject": true,
+      "rejection_reason": "NPS is not a certified metric in this catalog"
+    }
+  ]
+}

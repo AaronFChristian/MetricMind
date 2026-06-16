@@ -1,0 +1,15 @@
+# prometheus.yml
+# Prometheus scrapes the FastAPI /metrics endpoint every 15 seconds.
+# Grafana reads from Prometheus to build dashboards.
+#
+# Flow: FastAPI -> /metrics -> Prometheus -> Grafana dashboards
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "metricmind-api"
+    static_configs:
+      - targets: ["host.docker.internal:8000"]
+    metrics_path: /metrics

@@ -1,0 +1,78 @@
+version: 2
+
+models:
+
+  - name: mart_user_metrics
+    description: >
+      Daily active users with governed activity definition.
+      One row per (metric_date x plan x country x acquisition_channel).
+    columns:
+      - name: metric_date
+        description: "The calendar date for this row."
+        data_tests: [not_null]
+      - name: daily_active_users
+        description: "Distinct users with at least one governed activity event on this date."
+        data_tests: [not_null]
+      - name: plan
+        description: "Subscription plan dimension."
+        data_tests:
+          - not_null
+          - accepted_values:
+              config:
+                severity: warn
+              values: ['free', 'starter', 'pro', 'enterprise', 'unknown']
+
+  - name: mart_cohort_retention
+    description: >
+      Monthly cohort retention heatmap data.
+      One row per (cohort_month x retention_period x plan x country).
+    columns:
+      - name: cohort_month
+        description: "The month users in this cohort signed up."
+        data_tests: [not_null]
+      - name: retention_period
+        description: "Months since cohort_month. 0=signup month."
+        data_tests: [not_null]
+      - name: cohort_size
+        description: "Total users in this cohort at sign-up (denominator)."
+        data_tests: [not_null]
+      - name: retained_users
+        description: "Users in this cohort active in this retention period."
+        data_tests: [not_null]
+      - name: retention_rate_pct
+        description: "retained_users / cohort_size x 100. NULL if no events yet."
+
+  - name: mart_revenue_metrics
+    description: >
+      SaaS revenue KPIs by month, plan, country, and acquisition channel.
+    columns:
+      - name: metric_month
+        description: "The calendar month for this row."
+        data_tests: [not_null]
+      - name: mrr
+        description: "Monthly recurring revenue (USD) from active subscriptions."
+        data_tests: [not_null]
+      - name: arr
+        description: "Annualised recurring revenue (MRR x 12)."
+        data_tests: [not_null]
+      - name: churn_rate_pct
+        description: "Percentage of paying customers who churned this month. NULL if no prior month data."
+
+  - name: mart_funnel_analysis
+    description: >
+      Signup-to-retention funnel rates by cohort month and dimension.
+      Rate columns are NULL when the cohort has not yet reached that stage
+      (e.g. recent signups have no day-30 data yet — this is correct behaviour).
+    columns:
+      - name: cohort_month
+        description: "Signup month for this cohort."
+        data_tests: [not_null]
+      - name: signups
+        description: "Total users who signed up in this cohort."
+        data_tests: [not_null]
+      - name: activation_rate_pct
+        description: "Percent of signups active within 7 days. NULL for cohorts with no event data yet."
+      - name: signup_to_paid_rate_pct
+        description: "Percent of signups who made at least one payment. NULL if no payments yet."
+      - name: day30_retention_rate_pct
+        description: "Percent of signups active again between days 28-35. NULL for recent cohorts."
