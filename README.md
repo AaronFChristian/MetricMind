@@ -40,8 +40,8 @@ Three pillars working together:
 | Resource | URL |
 |---|---|
 | Frontend | https://metric-mind-liart.vercel.app |
-| Tableau MRR Chart |  |
-| Tableau Retention | |
+| Tableau MRR Chart | https://public.tableau.com/app/profile/aaron.christian8625/viz/MetricMindMrrChart/MrrChart |
+| Tableau Retention | https://public.tableau.com/app/profile/aaron.christian8625/viz/MetricMindsCohortRetention/CohortRetention |
 | Grafana (local) | http://localhost:3001 (admin / metricmind) |
 | API Docs | http://localhost:8000/docs |
 | GitHub | |
