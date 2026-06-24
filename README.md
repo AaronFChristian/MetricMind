@@ -44,7 +44,7 @@ Three pillars working together:
 | Tableau Retention | https://public.tableau.com/app/profile/aaron.christian8625/viz/MetricMindsCohortRetention/CohortRetention |
 | Grafana (local) | http://localhost:3001 (admin / metricmind) |
 | API Docs | http://localhost:8000/docs |
-| GitHub | |
+| GitHub | https://github.com/AaronFChristian/MetricMind |
 
 ---
 
