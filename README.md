@@ -48,6 +48,15 @@ Three pillars working together:
 
 ---
 
+### Video
+
+https://github.com/user-attachments/assets/233fe647-f3d6-4c01-a7dc-15d03d4d9f5e
+
+
+https://github.com/user-attachments/assets/b180c49f-992d-4b63-a6d6-1af87276c19a
+
+---
+
 ## Tech Stack
 
 ### Data and Analytics Engineering
