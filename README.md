@@ -1,4 +1,4 @@
-# MetricMind
+# MetricMind 
 
 **A governed text-to-SQL analytics copilot where the LLM cannot invent metrics that do not exist.**
 
