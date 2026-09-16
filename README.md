@@ -4,7 +4,7 @@
 
 Every answer traces back to a certified dbt model. Business teams get self-serve analytics in plain English. Analysts get their time back.
 
-[![dbt Tests](https://img.shields.io/badge/dbt_tests-36_pass-4caf7d?style=flat-square)](dbt_project)
+[![Eval Accuracy](https://img.shields.io/badge/eval-100%25_(10%2F10_quick)-4caf7d?style=flat-square)](eval/golden_set.json)
 [![dbt Tests](https://img.shields.io/badge/dbt_tests-36_pass-4caf7d?style=flat-square)](dbt_project/)
 [![Live Demo](https://img.shields.io/badge/demo-live-6c63ff?style=flat-square)](https://metric-mind-liart.vercel.app)
 [![Tableau](https://img.shields.io/badge/tableau-public-E97627?style=flat-square)]()
